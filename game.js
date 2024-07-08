@@ -28,11 +28,31 @@ const game = {
         if (this.displayTime < 100) {
           this.displayTime = 100;
         }
+        this.throwConfetti();
       } else {
-        resultElement.textContent = `Wrong! The number was ${this.currentNumber}. Stay on Level ${this.level}`;
+        this.gameOver();
       }
   
       document.getElementById('user-input').value = '';
+    },
+  
+    throwConfetti() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    },
+  
+    gameOver() {
+      document.querySelector('.game-over').style.display = 'flex';
+    },
+  
+    restart() {
+      this.level = 1;
+      this.displayTime = 2000;
+      document.querySelector('.game-over').style.display = 'none';
+      document.getElementById('result').textContent = '';
       this.displayNumber();
     },
   
@@ -48,7 +68,12 @@ const game = {
     },
   
     init() {
-      document.getElementById('submit-btn').addEventListener('click', () => this.checkGuess());
+      document.getElementById('submit-btn').addEventListener('click', () => {
+        this.checkGuess();
+        if (this.level > 1) {  // Only display next number if not game over
+          this.displayNumber();
+        }
+      });
       
       const dialButtons = document.querySelectorAll('.dial-button');
       dialButtons.forEach(button => {
@@ -57,6 +82,8 @@ const game = {
           this.handleDialInput(value);
         });
       });
+  
+      document.getElementById('restart-btn').addEventListener('click', () => this.restart());
   
       this.displayNumber();
     }
